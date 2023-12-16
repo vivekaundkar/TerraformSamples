@@ -2,8 +2,18 @@ provider "aws" {
   region = "ap-southeast-2"
 }
 
-module "s3" {
-  source = "./modules/s3"
+resource "aws_s3_bucket" "terraform_state_bucket" {
+  bucket = "SBS-tfstate-bucket"
+  acl    = "private"
+
+  versioning {
+    enabled = true
+  }
+
+  tags = {
+    Name        = "TerraformStateBucket"
+    Environment = "Dev"
+  }
 }
 
 terraform {
@@ -18,5 +28,5 @@ terraform {
 
 module "ecs" {
   source       = "./modules/ecs"
-  cluster_name = "my-fargate-cluster"
+  cluster_name = "SBS-fargate-cluster"
 }

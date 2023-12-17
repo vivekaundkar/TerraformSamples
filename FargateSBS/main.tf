@@ -2,20 +2,6 @@ provider "aws" {
   region = "ap-southeast-2"
 }
 
-resource "aws_s3_bucket" "terraform_state_bucket" {
-  bucket = "sbs-tfstate-bucket"
-  acl    = "private"
-
-  versioning {
-    enabled = true
-  }
-
-  tags = {
-    Name        = "TerraformStateBucket"
-    Environment = "Dev"
-  }  
-}
-
 terraform {
   backend "s3" {
     bucket         = "sbs-tfstate-bucket"
@@ -61,7 +47,6 @@ resource "aws_iam_policy_attachment" "ecs_execution_role_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
   roles      = [aws_iam_role.ecs_execution_role.name]
 }
-
 
 # ECS Fargate Task Definition
 resource "aws_ecs_task_definition" "nginx_task_definition" {
@@ -122,13 +107,17 @@ resource "aws_lb" "nginx_alb" {
 # ALB Listener
 resource "aws_lb_listener" "nginx_alb_listener" {
   load_balancer_arn = aws_lb.nginx_alb.arn
-  port              = 80
-  protocol          = "HTTP"
+  port              = 443  # Change to the desired SSL/TLS port
+  protocol          = "HTTPS"
+
+  ssl_policy = "ELBSecurityPolicy-2016-08"  # Update with your desired SSL policy
 
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.nginx_target_group.arn
   }
+
+  certificate_arn = "arn:aws:acm:ap-southeast-2:239338699850:certificate/e5e553a0-d6f4-4c68-a2a9-ca8a01fe4e6e"
 }
 
 # ALB Target Group
@@ -142,7 +131,7 @@ resource "aws_lb_target_group" "nginx_target_group" {
 
 # ALB Listener Rule
 resource "aws_lb_listener_rule" "nginx_alb_rule" {
-  listener_arn = aws_lb_listener.nginx_alb_listener.arn
+  listener_arn = aws_lb_listener.nginx_alb_listener1.arn
   priority     = 100
 
   action {

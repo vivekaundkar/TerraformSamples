@@ -9,15 +9,17 @@ Once ECR repo is deployed this github repo can be used to
 Create a Fargate Cluster, Service, Task definition and deploy above specified ECR image into this cluster
 to use this repo from root run below commands
 Terraform init
-terraform apply -lock=false
+terraform apply
 
 If you want to destroy cluster run
-terraform destroy -lock=false
+terraform destroy
 
 As a pre requisite you will need Terraform and AWS CLI installed and configure on your local machine or build agent.
 
 This repo uses 2 S3 buckets
 sbs-tfstate-bucket - to store TF state
 sbsimages - To store images needed by container
+Dynamo DB table terraform-lock-table was already created
+
 
 It creates all required IAM roles for Fargate cluster and gives needed permissions

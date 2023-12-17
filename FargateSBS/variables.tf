@@ -1,6 +1,6 @@
 variable "cluster_name" {
   type    = string
-  default = "SBS-fargate-cluster"
+  default = "SBSTest-Fargate"
 }
 
 # ... other variables
